@@ -33,13 +33,13 @@ class BukuController extends Controller
                   ->orWhere('judul','like',"%{$search}%")
                   ->orWhere('pengarang','like',"%{$search}%")
                   ->orWhereHas('kategori', function($qCat) use ($search) {
-                      $qCat->where('name', 'like', "%{$search}%");
+                      $qCat->where('nama', 'like', "%{$search}%");
                   })
                   ->orWhere('penerbit','like',"%{$search}%");
             });
         }
 
-        $buku = $query->orderBy($sortBy,$sortDir)->paginate(10);
+        $buku = $query->orderBy($sortBy, $sortDir)->paginate(10)->withQueryString();
 
         return Inertia::render('Buku/Index',[
             'buku'=>$buku,
@@ -137,18 +137,8 @@ class BukuController extends Controller
 
     public function create()
     {
-        $last = Buku::where('kode_buku', 'like', 'BK%')->orderBy('id','desc')->first();
-
-        if(!$last){
-            $kode = 'BK001';
-        }else{
-            $num = (int) substr($last->kode_buku,2);
-            $num++;
-            $kode = 'BK'.str_pad($num,3,'0',STR_PAD_LEFT);
-        }
-
         return Inertia::render('Buku/Create',[
-            'kode_buku' => $kode,
+            'kode_buku' => $this->nextSequentialCode(Buku::class, 'kode_buku', 'BK', 3),
             'kategori_buku' => KategoriBuku::all()
         ]);
     }
@@ -203,11 +193,11 @@ class BukuController extends Controller
             })->exists();
 
         if ($isBorrowed) {
-            return redirect()->route('buku.index')->with('error', 'Buku tidak dapat dihapus karena masih dalam status sedang dipinjam.');
+            return redirect()->back()->with('error', 'Buku tidak dapat dihapus karena masih dalam status sedang dipinjam.');
         }
 
         $buku->delete();
 
-        return redirect()->route('buku.index')->with('success', 'Buku berhasil dihapus');
+        return redirect()->back()->with('success', 'Buku berhasil dihapus');
     }
 }

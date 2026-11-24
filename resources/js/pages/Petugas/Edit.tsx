@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
@@ -21,7 +21,6 @@ interface Props {
 }
 
 export default function PetugasEdit({ user }: Props) {
-    const { auth } = usePage<{ auth: { user: { role: string } } }>().props;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -99,7 +98,7 @@ export default function PetugasEdit({ user }: Props) {
                                         <SelectValue placeholder="Pilih Role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {(auth.user.role === 'super_admin' || user.role === 'super_admin') && (
+                                        {user.role === 'super_admin' && (
                                             <SelectItem value="super_admin">Admin</SelectItem>
                                         )}
                                         <SelectItem value="admin">Petugas</SelectItem>

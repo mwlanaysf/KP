@@ -73,7 +73,7 @@ export default function PengaturanPeminjaman() {
 
   const submitDurasi = (e: React.FormEvent) => {
     e.preventDefault()
-    durasiForm.post(route('pengaturan-peminjaman.durasi'), { preserveScroll: true })
+    durasiForm.post(route('pengaturan-peminjaman.durasi'), { preserveScroll: true, preserveState: true })
   }
 
   // ── Search & Filter ──────────────────────────────────────────────
@@ -127,11 +127,13 @@ export default function PengaturanPeminjaman() {
     if (editTarget) {
       holidayForm.put(route('hari-libur.update', editTarget.id), {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: closeModal,
       })
     } else {
       holidayForm.post(route('hari-libur.store'), {
         preserveScroll: true,
+        preserveState: true,
         onSuccess: closeModal,
       })
     }
@@ -146,6 +148,7 @@ export default function PengaturanPeminjaman() {
     setDeleting(true)
     router.delete(route('hari-libur.destroy', deleteId), {
       preserveScroll: true,
+      preserveState: true,
       onFinish: () => {
         setDeleting(false)
         setDeleteId(null)

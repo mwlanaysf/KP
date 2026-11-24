@@ -95,3 +95,22 @@ it('validasi: anggota_id dan buku_id wajib diisi', function () {
     $response->assertSessionHasErrors(['anggota_id', 'buku_id']);
 });
 
+
+it('jatuh tempo yang jatuh pada Sabtu atau Minggu digeser ke Senin', function () {
+    // Jumat 13 Nov 2026 + durasi 8 hari = Sabtu 21 Nov -> digeser ke Senin 23 Nov
+    \Illuminate\Support\Carbon::setTestNow(\Illuminate\Support\Carbon::parse('2026-11-13 09:00:00'));
+    \App\Models\Pengaturan::create(['durasi_peminjaman' => 8, 'maksimal_pinjam' => 3, 'denda_per_hari' => 2000]);
+
+    $anggota = Anggota::factory()->create();
+    $buku = Buku::factory()->create(['stok' => 5]);
+
+    $this->actingAs($this->admin)->post(route('peminjaman.store'), [
+        'anggota_id' => $anggota->id,
+        'buku_id' => [$buku->id],
+    ]);
+
+    $tanggalKembali = Peminjaman::first()->tanggal_kembali;
+    expect(\Illuminate\Support\Carbon::parse($tanggalKembali)->toDateString())->toBe('2026-11-23');
+
+    \Illuminate\Support\Carbon::setTestNow();
+});

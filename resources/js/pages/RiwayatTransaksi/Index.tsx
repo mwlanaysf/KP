@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout'
 import { type BreadcrumbItem } from '@/types'
-import { Head, router, Link, usePage } from '@inertiajs/react'
+import { Head, router, Link, usePage, usePoll } from '@inertiajs/react'
 import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -79,6 +79,10 @@ export default function RiwayatTransaksiIndex({
   const role = props.auth?.user?.role || 'admin'
   const canViewDetail = ['admin', 'super_admin'].includes(role)
 
+  // Auto-refresh data riwayat tiap 10 detik (hanya prop 'riwayat', filter & halaman tetap).
+  // Polling otomatis berhenti saat tab tidak aktif.
+  usePoll(10000, { only: ['riwayat'] })
+
   const [searchValue, setSearchValue] = useState(search || '')
   const [sortByState, setSortByState] = useState(sortBy || 'tanggal')
   const [sortDirState, setSortDirState] = useState(sortDir || 'desc')
@@ -154,6 +158,26 @@ export default function RiwayatTransaksiIndex({
     setDari('')
     setSampai('')
     router.get(route('riwayat-transaksi.index'), {}, { preserveScroll: true })
+  }
+
+  // Link ke halaman detail riwayat, membawa filter/halaman aktif agar tombol "Kembali" mengembalikan tampilan ini
+  const detailUrl = (row: RiwayatItem) => {
+    const slug =
+      row.jenis_transaksi === 'Peminjaman'
+        ? 'peminjaman'
+        : row.jenis_transaksi === 'Pengembalian'
+        ? 'pengembalian'
+        : 'denda'
+    const q = new URLSearchParams()
+    if (search) q.set('search', search)
+    if (filterJenis && filterJenis !== 'semua') q.set('jenis', filterJenis)
+    if (sortBy) q.set('sortBy', sortBy)
+    if (sortDir) q.set('sortDir', sortDir)
+    if (tanggal_dari) q.set('tanggal_dari', tanggal_dari)
+    if (tanggal_sampai) q.set('tanggal_sampai', tanggal_sampai)
+    if (riwayat.current_page > 1) q.set('page', String(riwayat.current_page))
+    const qs = q.toString()
+    return `/riwayat-transaksi/${slug}/${row.id_transaksi}${qs ? `?${qs}` : ''}`
   }
 
   const getSortIcon = (column: string) => {
@@ -266,9 +290,8 @@ export default function RiwayatTransaksiIndex({
                     variant={jenisState === option.value ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => handleFilterJenis(option.value)}
-                    className={`whitespace-nowrap h-7 px-3 text-xs font-medium rounded transition-all ${
-                      jenisState !== option.value ? 'text-gray-500 hover:text-gray-900 dark:text-gray-400 hover:dark:text-gray-100' : ''
-                    }`}
+                    className={`whitespace-nowrap h-7 px-3 text-xs font-medium rounded transition-all ${jenisState !== option.value ? 'text-gray-500 hover:text-gray-900 dark:text-gray-400 hover:dark:text-gray-100' : ''
+                      }`}
                   >
                     {option.label}
                   </Button>
@@ -362,10 +385,10 @@ export default function RiwayatTransaksiIndex({
                       <TableCell className="whitespace-nowrap text-gray-700 dark:text-gray-300">
                         {row.tanggal
                           ? new Date(row.tanggal).toLocaleDateString('id-ID', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            })
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          })
                           : '-'}
                       </TableCell>
 
@@ -395,13 +418,7 @@ export default function RiwayatTransaksiIndex({
                         <TableCell className="text-center">
                           <Button variant="outline" size="sm" asChild>
                             <Link
-                              href={
-                                row.jenis_transaksi === 'Peminjaman'
-                                  ? `/peminjaman/${row.id_transaksi}`
-                                  : row.jenis_transaksi === 'Pengembalian'
-                                  ? `/pengembalian/${row.id_transaksi}`
-                                  : `/denda`
-                              }
+                              href={detailUrl(row)}
                             >
                               <Eye className="w-4 h-4 mr-1" />
                               Detail

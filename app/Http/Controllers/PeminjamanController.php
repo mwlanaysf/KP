@@ -7,6 +7,7 @@ use App\Models\DetailPeminjaman;
 use App\Models\HariLibur;
 use App\Models\Peminjaman;
 use App\Models\Pengaturan;
+use App\Services\DendaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +25,7 @@ class PeminjamanController extends Controller
     {
         $pengaturan = Pengaturan::first();
         $durasi = $pengaturan ? $pengaturan->durasi_peminjaman : 7;
-        $tanggalKembali = $this->shiftIfHariLibur(now()->addDays($durasi));
+        $tanggalKembali = DendaService::hariBukaBerikutnya(now()->addDays($durasi));
 
         return Inertia::render('Peminjaman/Create', [
 
@@ -39,26 +40,7 @@ class PeminjamanController extends Controller
 
     private function generateKode()
     {
-
-        $today = now()->format('ymd');
-        $prefix = 'PMJ'.$today;
-
-        $last = Peminjaman::where('kode_peminjaman', 'like', $prefix . '%')
-            ->orderBy('id','desc')
-            ->first();
-
-        $number = 1;
-
-        if($last && $last->kode_peminjaman){
-
-            $lastNumber = (int)substr($last->kode_peminjaman,-3);
-
-            $number = $lastNumber + 1;
-
-        }
-
-        return $prefix.str_pad($number,3,'0',STR_PAD_LEFT);
-
+        return $this->nextSequentialCode(Peminjaman::class, 'kode_peminjaman', 'PMJ' . now()->format('ymd'), 3);
     }
 
     public function store(Request $request)
@@ -79,7 +61,7 @@ class PeminjamanController extends Controller
             DB::transaction(function () use ($validated, $pengaturan){
 
                 $durasi = $pengaturan ? $pengaturan->durasi_peminjaman : 7;
-                $tanggalKembali = $this->shiftIfHariLibur(now()->addDays($durasi));
+                $tanggalKembali = DendaService::hariBukaBerikutnya(now()->addDays($durasi));
 
                 $peminjaman = Peminjaman::create([
 
@@ -137,22 +119,6 @@ class PeminjamanController extends Controller
         return Inertia::render('Peminjaman/Show',[
             'peminjaman' => $peminjaman
         ]);
-    }
-
-    /**
-     * Geser tanggal ke depan selama masih bertepatan dengan hari libur.
-     */
-    private function shiftIfHariLibur(Carbon $date): Carbon
-    {
-        $maxIterasi = 60; // safety: maksimal geser 60 hari
-        $iterasi    = 0;
-
-        while ($iterasi < $maxIterasi && HariLibur::whereDate('tanggal', $date->toDateString())->exists()) {
-            $date->addDay();
-            $iterasi++;
-        }
-
-        return $date;
     }
 
 }

@@ -104,7 +104,7 @@
                             $status = $row->status;
                             if ($status === 'Dipinjam') {
                                 $jatuhTempo = \Carbon\Carbon::parse($row->tanggal_kembali)->startOfDay();
-                                if (\Carbon\Carbon::now()->startOfDay()->gt($jatuhTempo)) {
+                                if (\App\Services\DendaService::hitungKeterlambatan($jatuhTempo) > 0) {
                                     $status = 'Terlambat';
                                 }
                             }

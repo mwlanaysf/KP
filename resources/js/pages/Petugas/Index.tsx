@@ -139,11 +139,13 @@ export default function PetugasIndex({
     if (modal.type === 'delete') {
       destroy(route('petugas.destroy', modal.user.id), {
         preserveScroll: true,
+        preserveState: true,
         onFinish: finish,
       })
     } else if (modal.type === 'activate' || modal.type === 'deactivate') {
       router.patch(route('petugas.toggle-status', modal.user.id), {}, {
         preserveScroll: true,
+        preserveState: true,
         onFinish: finish,
       })
     }

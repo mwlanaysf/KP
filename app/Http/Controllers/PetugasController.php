@@ -16,9 +16,11 @@ class PetugasController extends Controller
         $search = $request->get('search');
         $users = User::query()
             ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
                       ->orWhere('username', 'like', "%{$search}%")
                       ->orWhere('role', 'like', "%{$search}%");
+                });
             })
             ->whereIn('role', ['admin', 'kepala_sekolah'])
             ->orderBy('id', 'desc')
@@ -40,9 +42,9 @@ class PetugasController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:255',
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->whereNull('deleted_at')],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')],
             'password' => 'required|string|confirmed',
-            'role'     => ['required', Rule::in(['super_admin', 'admin', 'kepala_sekolah'])],
+            'role'     => ['required', Rule::in(['admin', 'kepala_sekolah'])],
             'status'   => ['required', Rule::in(['aktif', 'nonaktif'])],
         ]);
 
@@ -78,7 +80,7 @@ class PetugasController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:255',
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'role'     => ['required', Rule::in(['super_admin', 'admin', 'kepala_sekolah'])],
             'status'   => ['required', Rule::in(['aktif', 'nonaktif'])],
             'password' => 'nullable|string|confirmed',

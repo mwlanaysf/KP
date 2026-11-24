@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function PetugasCreate() {
-    const { auth } = usePage<{ auth: { user: { role: string } } }>().props;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -87,9 +86,6 @@ export default function PetugasCreate() {
                                         <SelectValue placeholder="Pilih Role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {auth.user.role === 'super_admin' && (
-                                            <SelectItem value="super_admin">Admin</SelectItem>
-                                        )}
                                         <SelectItem value="admin">Petugas</SelectItem>
                                         <SelectItem value="kepala_sekolah">Kepala Sekolah</SelectItem>
                                     </SelectContent>

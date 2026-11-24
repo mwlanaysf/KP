@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\Cache;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Rabu, 18 November 2026 (hari kerja) agar perhitungan hari buka deterministik
+    Carbon::setTestNow(Carbon::parse('2026-11-18 10:00:00'));
     $this->admin = User::factory()->admin()->create();
     Cache::forget('tarif_denda');
+});
+
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
 it('mengembalikan buku tepat waktu: stok bertambah, status jadi Dikembalikan, tidak ada denda', function () {
@@ -127,4 +133,22 @@ it('halaman show pengembalian membuat denda otomatis jika terlambat', function (
         'pengembalian_id' => $pengembalian->id,
         'total_denda' => 4 * 2000 * 1,
     ]);
+});
+
+it('Sabtu dan Minggu tidak dihitung terlambat saat pengembalian', function () {
+    // Hari ini Senin 16 Nov 2026, jatuh tempo Jumat 13 Nov -> hanya Senin yang dihitung (1 hari)
+    Carbon::setTestNow(Carbon::parse('2026-11-16 10:00:00'));
+
+    $buku = Buku::factory()->create(['stok' => 2]);
+    $peminjaman = Peminjaman::factory()->create([
+        'status' => 'Dipinjam',
+        'tanggal_kembali' => '2026-11-13',
+    ]);
+    DetailPeminjaman::factory()->create(['peminjaman_id' => $peminjaman->id, 'buku_id' => $buku->id]);
+
+    $this->actingAs($this->admin)->post(route('pengembalian.store'), [
+        'peminjaman_id' => $peminjaman->id,
+    ]);
+
+    $this->assertDatabaseHas('pengembalian', ['peminjaman_id' => $peminjaman->id, 'terlambat' => 1]);
 });

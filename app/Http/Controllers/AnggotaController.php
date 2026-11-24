@@ -53,18 +53,8 @@ class AnggotaController extends Controller
 
     public function create()
     {
-        $last = Anggota::where('kode_anggota', 'like', 'AG%')->orderBy('id','desc')->first();
-
-        if (!$last) {
-            $kode = 'AG001';
-        } else {
-            $num = (int) substr($last->kode_anggota, 2);
-            $num++;
-            $kode = 'AG'.str_pad($num, 3, '0', STR_PAD_LEFT);
-        }
-
         return Inertia::render('Anggota/Create', [
-            'kode_anggota' => $kode,
+            'kode_anggota' => $this->nextSequentialCode(Anggota::class, 'kode_anggota', 'AG', 3),
             'jurusan' => Jurusan::all(),
         ]);
     }
@@ -116,12 +106,12 @@ class AnggotaController extends Controller
         })->exists();
 
         if ($hasActiveTransactions || $hasUnpaidFines) {
-            return redirect()->route('anggota.index')->with('error', 'Anggota tidak dapat dihapus karena masih memiliki transaksi aktif atau denda yang belum lunas.');
+            return redirect()->back()->with('error', 'Anggota tidak dapat dihapus karena masih memiliki transaksi aktif atau denda yang belum lunas.');
         }
 
         $anggota->delete();
 
-        return redirect()->route('anggota.index')->with('success', 'Anggota berhasil dihapus');
+        return redirect()->back()->with('success', 'Anggota berhasil dihapus');
     }
 
     /**

@@ -85,10 +85,14 @@ export default function MajorIndex({ jurusan }: { jurusan: any }) {
     e.preventDefault()
     if (isEditing && data.id) {
       put(route('jurusan.update', data.id), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => setIsModalOpen(false),
       })
     } else {
       post(route('jurusan.store'), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
           setIsModalOpen(false)
           reset()
@@ -106,6 +110,7 @@ export default function MajorIndex({ jurusan }: { jurusan: any }) {
     setDeleteLoading(true)
     destroy(route('jurusan.destroy', confirmItem.id), {
       preserveScroll: true,
+      preserveState: true,
       onFinish: () => {
         setDeleteLoading(false)
         setConfirmItem(null)

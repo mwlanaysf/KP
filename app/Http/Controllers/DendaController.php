@@ -82,7 +82,7 @@ class DendaController extends Controller
                 break;
         }
         
-        $dendaPaginator = $query->paginate(10);
+        $dendaPaginator = $query->paginate(10)->withQueryString();
 
         // Transform data untuk menampilkan informasi denda
         $data = $dendaPaginator->getCollection()->map(function($denda) {

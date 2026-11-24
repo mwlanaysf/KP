@@ -336,7 +336,7 @@ class LaporanController extends Controller
                     $status = $r->status ?? '-';
                     if ($status === 'Dipinjam' && $r->tanggal_kembali) {
                         $jatuhTempo = \Carbon\Carbon::parse($r->tanggal_kembali)->startOfDay();
-                        if (now()->startOfDay()->gt($jatuhTempo)) {
+                        if (\App\Services\DendaService::hitungKeterlambatan($jatuhTempo) > 0) {
                             $status = 'Terlambat';
                         }
                     }

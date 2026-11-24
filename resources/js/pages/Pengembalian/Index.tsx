@@ -145,7 +145,15 @@ export default function PengembalianIndex({ peminjaman }: { peminjaman: Paginate
       }
     }
 
-    const terlambat = Math.abs(diffDays)
+    // Hari terlambat dihitung server (hanya hari buka: Sabtu/Minggu/hari libur dilewati)
+    const terlambat = Number(row.hari_terlambat ?? Math.abs(diffDays))
+
+    if (terlambat <= 0) {
+      return {
+        badgeClass: 'text-orange-600 dark:text-orange-400 font-semibold',
+        label: 'Jatuh tempo (libur)',
+      }
+    }
 
     return {
       badgeClass: 'text-destructive dark:text-red-400 font-semibold',

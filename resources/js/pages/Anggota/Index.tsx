@@ -103,6 +103,8 @@ export default function AnggotaIndex({ anggota }: { anggota: PaginatedData }) {
     if (!confirmItem) return
     setDeleteLoading(true)
     destroy(route('anggota.destroy', confirmItem.id), {
+      preserveScroll: true,
+      preserveState: true,
       onSuccess: () => {
         setConfirmItem(null)
         setDeleteLoading(false)

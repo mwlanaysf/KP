@@ -12,6 +12,7 @@ use App\Models\Pengaturan;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use App\Services\DendaService;
 
 class PengembalianController extends Controller
 {
@@ -59,6 +60,14 @@ class PengembalianController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Hari terlambat hanya menghitung hari buka (Sabtu/Minggu/hari libur dilewati)
+        $peminjaman->getCollection()->transform(function ($p) {
+            $p->hari_terlambat = $p->tanggal_kembali
+                ? DendaService::hitungKeterlambatan($p->tanggal_kembali)
+                : 0;
+            return $p;
+        });
+
         return Inertia::render('Pengembalian/Index', [
             'peminjaman' => $peminjaman,
             'search' => $search,
@@ -89,9 +98,9 @@ class PengembalianController extends Controller
             : null;
 
         if ($jatuhTempo && $dikembalikan) {
-            $statusPengembalian = $dikembalikan->gt($jatuhTempo) ? 'Terlambat' : 'Tepat waktu';
+            $statusPengembalian = ($pengembalian->terlambat ?? 0) > 0 ? 'Terlambat' : 'Tepat waktu';
         } elseif ($jatuhTempo && !$dikembalikan) {
-            $statusPengembalian = $today->gt($jatuhTempo) ? 'Terlambat' : 'Dipinjam';
+            $statusPengembalian = DendaService::hitungKeterlambatan($jatuhTempo, $today) > 0 ? 'Terlambat' : 'Dipinjam';
         } else {
             $statusPengembalian = $dikembalikan ? 'Tepat waktu' : 'Dipinjam';
         }
@@ -181,9 +190,7 @@ class PengembalianController extends Controller
                 $tanggal_dikembalikan = Carbon::now()->startOfDay();
                 $tanggal_kembali = Carbon::parse($peminjaman->tanggal_kembali)->startOfDay();
 
-                $hariTerlambat = $tanggal_dikembalikan->gt($tanggal_kembali)
-                    ? abs((int) $tanggal_dikembalikan->diffInDays($tanggal_kembali))
-                    : 0;
+                $hariTerlambat = DendaService::hitungKeterlambatan($tanggal_kembali, $tanggal_dikembalikan);
 
 
                 $pengembalian = Pengembalian::create([
@@ -248,9 +255,9 @@ class PengembalianController extends Controller
                 $pengembalian->delete();
             });
 
-            return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian dihapus. Status peminjaman dan stok buku telah dikembalikan.');
+            return redirect()->back()->with('success', 'Data pengembalian dihapus. Status peminjaman dan stok buku telah dikembalikan.');
         } catch (\Exception $e) {
-            return redirect()->route('pengembalian.index')->with('error', 'Gagal menghapus pengembalian: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus pengembalian: ' . $e->getMessage());
         }
     }
     
@@ -270,9 +277,7 @@ class PengembalianController extends Controller
             $tanggalKembali = Carbon::parse($peminjaman->tanggal_kembali)->startOfDay();
             $tanggalDikembalikan = Carbon::parse($pengembalian->tanggal_dikembalikan)->startOfDay();
             
-            $terlambat = $tanggalDikembalikan->gt($tanggalKembali)
-                ? abs((int) $tanggalDikembalikan->diffInDays($tanggalKembali))
-                : 0;
+            $terlambat = DendaService::hitungKeterlambatan($tanggalKembali, $tanggalDikembalikan);
             
             // Update terlambat field
             $pengembalian->update(['terlambat' => $terlambat]);
@@ -307,7 +312,7 @@ class PengembalianController extends Controller
             }
         }
         
-        return redirect()->route('pengembalian.index')->with('success', 'Denda berhasil disinkronkan untuk ' . $count . ' data terlambat');
+        return redirect()->back()->with('success', 'Denda berhasil disinkronkan untuk ' . $count . ' data terlambat');
     }
 }
 

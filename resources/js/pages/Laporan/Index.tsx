@@ -699,7 +699,7 @@ function BukuReportCard() {
             <SelectContent>
               <SelectItem value="semua">Semua Kategori</SelectItem>
               {kategori_buku?.map((c: any) => (
-                <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+                <SelectItem key={c.id} value={c.id.toString()}>{c.nama}</SelectItem>
               ))}
             </SelectContent>
           </Select>

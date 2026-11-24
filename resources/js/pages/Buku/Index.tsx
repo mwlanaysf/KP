@@ -113,11 +113,11 @@ export default function BukuIndex({ buku }: { buku: PaginatedData }) {
     setDeleteLoading(true)
     destroy(route('buku.destroy', confirmItem.id), {
       preserveScroll: true,
+      preserveState: true,
       onFinish: () => {
         setDeleteLoading(false)
         setConfirmItem(null)
       },
-      onSuccess: () => router.reload({ only: ['buku'] }),
     })
   }
 

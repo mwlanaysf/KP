@@ -77,6 +77,7 @@ export default function DendaIndex({
       {
         onSuccess: () => setIsSettingOpen(false),
         preserveScroll: true,
+        preserveState: true,
       }
     )
   }
@@ -129,12 +130,10 @@ export default function DendaIndex({
       {},
       {
         preserveScroll: true,
+        preserveState: true,
         onFinish: () => {
           setBayarLoading(false)
           setConfirmId(null)
-        },
-        onSuccess: () => {
-          router.reload({ only: ['denda'] })
         },
       }
     )

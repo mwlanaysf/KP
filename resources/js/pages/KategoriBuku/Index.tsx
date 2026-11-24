@@ -87,10 +87,14 @@ export default function CategoryIndex({ kategori_buku }: { kategori_buku: any })
     e.preventDefault()
     if (isEditing && data.id) {
       put(route('kategori-buku.update', data.id), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => setIsModalOpen(false),
       })
     } else {
       post(route('kategori-buku.store'), {
+        preserveScroll: true,
+        preserveState: true,
         onSuccess: () => {
           setIsModalOpen(false)
           reset()
@@ -108,6 +112,7 @@ export default function CategoryIndex({ kategori_buku }: { kategori_buku: any })
     setDeleteLoading(true)
     destroy(route('kategori-buku.destroy', confirmItem.id), {
       preserveScroll: true,
+      preserveState: true,
       onFinish: () => {
         setDeleteLoading(false)
         setConfirmItem(null)
