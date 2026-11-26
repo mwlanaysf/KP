@@ -34,3 +34,9 @@ yarn-error.log
 
 # TypeScript cache
 /tsconfig.tsbuildinfo
+
+# Local tunnel & submission package
+/cloudflared.exe
+/db_perpus
+/paket_kumpul
+/*.zip
