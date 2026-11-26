@@ -1,76 +1,67 @@
 # Sistem Informasi Perpustakaan Sekolah
 
-Aplikasi berbasis web untuk mengelola operasional perpustakaan sekolah, mulai dari pendataan koleksi buku dan anggota, transaksi peminjaman dan pengembalian, perhitungan denda keterlambatan otomatis (melewati akhir pekan & hari libur), riwayat transaksi, hingga pencetakan laporan dalam format PDF dan Excel.
+Aplikasi berbasis web untuk membantu pengelolaan perpustakaan sekolah secara digital, mulai dari pendataan buku dan anggota, pencatatan peminjaman dan pengembalian, perhitungan denda keterlambatan otomatis (melewati akhir pekan & hari libur nasional), hingga pencetakan laporan dalam bentuk PDF dan Excel.
 
 ---
 
 ## Fitur Utama
 
-- **Dashboard Interaktif** — Ringkasan KPI, grafik tren peminjaman, anggota teraktif, buku terpopuler, daftar keterlambatan, dan aktivitas terbaru.
-- **Multi-Role Pengguna**:
-  - **Super Admin** — Akses penuh seluruh fitur, kelola pengguna (Petugas & Kepala Sekolah), pengaturan durasi peminjaman, tarif denda, dan hari libur.
-  - **Petugas (`admin`)** — Operasional harian (kelola buku, kategori, anggota, jurusan, peminjaman, pengembalian, denda, riwayat, dan laporan).
-  - **Kepala Sekolah** — Akses pantau (*read-only*) untuk dashboard, data koleksi/anggota, riwayat transaksi, dan cetak laporan.
-- **Manajemen Data Master** — CRUD Buku, Kategori Buku, Anggota, dan Jurusan (dilengkapi *soft delete* dan pembuatan kode urut otomatis).
-- **Peminjaman, Pengembalian & Denda Otomatis** — Stok buku berkurang/bertambah secara atomik, tanggal jatuh tempo otomatis bergeser jika bertepatan dengan Sabtu, Minggu, atau hari libur terdaftar, serta perhitungan keterlambatan hanya menghitung hari kerja buka.
-- **Riwayat Transaksi Terpadu** — Menggabungkan riwayat peminjaman, pengembalian, dan pelunasan denda secara kronologis dari yang terbaru.
-- **Laporan & Ekspor Data** — Cetak laporan buku, anggota, peminjaman, pengembalian, denda, dan statistik dalam format **PDF** maupun **Excel (`.xlsx`)**.
+- **Dashboard Ringkas** — Menampilkan ringkasan jumlah buku, anggota, grafik peminjaman, buku terpopuler, serta daftar siswa yang terlambat mengembalikan buku.
+- **3 Hak Akses Pengguna**:
+  - **Super Admin** — Akses penuh seluruh sistem, mengelola akun petugas & kepala sekolah, mengatur lama peminjaman, tarif denda per hari, serta daftar hari libur.
+  - **Petugas (`admin`)** — Mengelola operasional harian (tambah/edit buku, kategori, anggota, jurusan, proses peminjaman, pengembalian, denda, dan cetak laporan).
+  - **Kepala Sekolah** — Akses pantau (*hanya baca*) untuk melihat dashboard, daftar buku, anggota, riwayat transaksi, dan mengunduh laporan.
+- **Perhitungan Jatuh Tempo & Denda Otomatis** — Stok buku otomatis berkurang saat dipinjam dan bertambah saat dikembalikan. Jika tanggal jatuh tempo bertepatan dengan hari Sabtu, Minggu, atau hari libur terdaftar, sistem otomatis menggesernya ke hari masuk sekolah berikutnya.
+- **Laporan PDF & Excel** — Rekap data buku, anggota, peminjaman, pengembalian, dan denda dapat langsung diunduh dalam format **PDF** maupun **Excel (`.xlsx`)**.
 
 ---
 
-## Teknologi yang Digunakan
+## Aplikasi yang Harus Terpasang di Komputer
 
-- **Backend:** PHP 8.2+, Laravel 12
-- **Frontend:** React 19, TypeScript, Inertia.js v2, Tailwind CSS v4, Radix UI, Lucide Icons, Recharts
-- **Database:** MySQL / MariaDB
-- **Ekspor Dokumen:** `barryvdh/laravel-dompdf` (PDF) & `phpoffice/phpspreadsheet` (Excel)
+Sebelum memasang website ini, pastikan komputer/laptop Anda sudah terinstal aplikasi berikut:
 
----
-
-## Komponen & Prasyarat Sistem
-
-Pastikan perangkat Anda telah terpasang komponen berikut sebelum melakukan instalasi:
-
-1. **PHP >= 8.2** beserta ekstensi standar Laravel (`pdo_mysql`, `mbstring`, `openssl`, `xml`, `ctype`, `fileinfo`, `gd`, `zip`) — *sudah termasuk di paket XAMPP versi terbaru*.
-2. **MySQL / MariaDB** (misalnya melalui **XAMPP** atau **Laragon**).
-3. **Composer** >= 2.x *(diperlukan jika menginstal dari repositori GitHub)*.
-4. **Node.js** >= 18.x & **NPM** *(diperlukan untuk mem-build aset frontend jika menginstal dari GitHub)*.
-5. **Git** *(opsional, untuk melakukan clone repositori)*.
+1. **XAMPP** (versi terbaru dengan PHP 8.2 ke atas) — *digunakan sebagai server lokal dan tempat penyimpanan database (MySQL).*
+2. **Composer** — *digunakan untuk mengunduh komponen/library PHP yang dibutuhkan Laravel.*
+3. **Node.js** — *digunakan untuk memproses tampilan antarmuka website.*
+4. **Git** *(opsional)* — *digunakan untuk mengunduh proyek langsung lewat terminal (bisa juga diunduh manual lewat tombol hijau **Code -> Download ZIP** di halaman GitHub ini).*
 
 ---
 
-## Panduan Instalasi (Clone dari GitHub)
+## Cara Instalasi & Menjalankan Website (Langkah demi Langkah)
 
-Ikuti langkah-langkah berikut di terminal (PowerShell / CMD / Bash):
+### Langkah 1: Unduh Kode Proyek
+* **Cara Mudah (Tanpa Git):** Klik tombol hijau **`<> Code`** di bagian atas halaman GitHub ini -> pilih **`Download ZIP`** -> ekstrak file ZIP tersebut ke folder pilihan Anda (misalnya di `D:\perpustakaan`).
+* **Cara via Terminal (Menggunakan Git):**
+  ```bash
+  git clone [https://github.com/mwlanaysf/KP.git](https://github.com/mwlanaysf/KP.git)
+  cd KP
+  ```
 
-### 1. Clone Repositori
-```bash
-git clone https://github.com/mwlanaysf/KP.git
-cd KP
-```
+### Langkah 2: Buka Folder Proyek di Terminal
+Buka aplikasi **VS Code** (atau **Command Prompt / PowerShell**), lalu arahkan ke dalam folder proyek yang baru saja Anda unduh/ekstrak.
 
-### 2. Instal Dependency PHP & JavaScript
+### Langkah 3: Instal Komponen Pendukung
+Jalankan dua perintah berikut secara berurutan di terminal dan tunggu hingga selesai (pastikan komputer terhubung ke internet):
 ```bash
 composer install
 npm install
 ```
 
-### 3. Konfigurasi Environment (`.env`)
-Salin file `.env.example` menjadi `.env`, lalu buat `APP_KEY`:
+### Langkah 4: Siapkan File Pengaturan (`.env`)
+Salin file pengaturan contoh bernama `.env.example` menjadi `.env`, lalu buat kunci keamanan aplikasi dengan menjalankan perintah berikut:
 
-**Windows (PowerShell):**
-```powershell
-Copy-Item .env.example .env
-php artisan key:generate
-```
+* **Jika menggunakan PowerShell (Windows):**
+  ```powershell
+  Copy-Item .env.example .env
+  php artisan key:generate
+  ```
+* **Jika menggunakan CMD / Git Bash / Terminal Mac/Linux:**
+  ```bash
+  cp .env.example .env
+  php artisan key:generate
+  ```
 
-**Linux / macOS / Git Bash:**
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Pastikan konfigurasi database di file `.env` sesuai dengan pengaturan MySQL Anda (default XAMPP):
+Buka file **`.env`** yang baru dibuat, lalu pastikan bagian pengaturan database tertulis seperti berikut (standar bawaan XAMPP):
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -80,45 +71,41 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 4. Siapkan Database MySQL
-1. Nyalakan **MySQL** (dan **Apache** jika menggunakan phpMyAdmin) di XAMPP Control Panel.
-2. Buka `http://localhost/phpmyadmin`, lalu buat database baru bernama **`db_perpus`**.
-3. Jalankan migrasi tabel beserta data awal (*seeder*):
-   ```bash
-   php artisan migrate --seed
-   php artisan storage:link
-   ```
+### Langkah 5: Buat Database di phpMyAdmin
+1. Buka **XAMPP Control Panel**, lalu klik tombol **Start** pada **Apache** dan **MySQL**.
+2. Buka browser (Chrome/Edge) dan kunjungi alamat: **`http://localhost/phpmyadmin`**.
+3. Klik menu **Baru / New** di sisi kiri, ketik nama database **`db_perpus`**, lalu klik **Buat / Create** *(biarkan isinya kosong)*.
 
-### 5. Build Aset Frontend & Jalankan Server
-Untuk pemakaian normal / produksi (lebih ringan):
+### Langkah 6: Isi Struktur Tabel & Data Awal Otomatis
+Kembali ke terminal di dalam folder proyek, lalu jalankan dua perintah ini:
+```bash
+php artisan migrate --seed
+php artisan storage:link
+```
+*(Perintah pertama akan membuatkan seluruh tabel database sekaligus mengisi data awal yang diperlukan, sedangkan perintah kedua menghubungkan folder penyimpanan gambar/foto).*
+
+### Langkah 7: Siapkan Tampilan & Jalankan Website
+Jalankan perintah berikut di terminal:
 ```bash
 npm run build
 php artisan serve
 ```
+Setelah muncul tulisan `Server running on [http://127.0.0.1:8000]`, buka browser dan ketik alamat:
+👉 **`http://127.0.0.1:8000`**
 
-*(Atau jika sedang mengedit kode tampilan React, jalankan `npm run dev` di terminal terpisah bersamaan dengan `php artisan serve`.)*
-
-Buka browser dan akses: **`http://127.0.0.1:8000`**
-
----
-
-## Menjalankan dari Paket Siap Jalan (File ZIP)
-
-Jika Anda menggunakan paket arsip `.zip` siap jalan (yang sudah menyertakan `vendor/`, `public/build/`, dan `.env`), Anda **tidak perlu** menjalankan `composer install` maupun `npm install`:
-
-1. Ekstrak arsip `.zip`, lalu nyalakan **MySQL** di XAMPP.
-2. Buat database bernama **`db_perpus`** di phpMyAdmin.
-3. Jalankan `php artisan migrate --seed` di terminal dalam folder proyek *(atau import file `db_perpus.sql` melalui phpMyAdmin jika disertakan)*.
-4. Jalankan `php artisan serve` dan buka **`http://127.0.0.1:8000`**.
+*(Catatan: Jangan tutup jendela terminal selama website sedang digunakan. Jika ingin menghentikan website, tekan `Ctrl + C` di terminal).*
 
 ---
 
-## Akun Login Default
+## Akun Login Bawaan
 
-Setelah menjalankan `php artisan migrate --seed`, Anda dapat langsung masuk menggunakan akun bawaan berikut:
+Website ini tidak memiliki halaman pendaftaran umum demi keamanan data perpustakaan. Setelah menjalankan perintah instalasi di atas, Anda dapat langsung masuk menggunakan salah satu dari 3 akun berikut:
 
-| Peran | Username | Password |
+| Jabatan / Peran | Username | Password |
 |---|---|---|
 | **Super Admin** | `admin` | `admin` |
-| **Petugas** | `petugas` | `petugas` |
-| **Kepala Sekolah** | `kepsek` | `kepsek` |
+| **Petugas Perpustakaan** | `petugas` | `petugas` |
+| **Kepala Sekolah** | `kepalasekolah` | `kepalasekolah` |
+
+> **Catatan Kondisi Data Awal:**
+> Saat pertama kali berhasil login, daftar **Buku**, **Anggota**, dan **Transaksi Peminjaman** memang sengaja dalam keadaan **kosong (0)** agar siap diisi dengan data asli sekolah Anda. Sementara itu, data referensi dasar seperti **Kategori Buku**, **Jurusan**, **Hari Libur**, dan **3 Akun Login** di atas sudah terisi secara otomatis.
