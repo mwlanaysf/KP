@@ -144,9 +144,6 @@ class PengembalianController extends Controller
         // Reload semua relasi termasuk denda
         $pengembalian->load(['peminjaman.anggota:id,kode_anggota,nama,kelas,jurusan_id,deleted_at', 'peminjaman.anggota.jurusan', 'peminjaman.detail_peminjaman.buku', 'denda']);
 
-        // Debug: cek data denda
-        // dd($pengembalian->denda);
-
         return Inertia::render('Pengembalian/Show', [
             'pengembalian' => $pengembalian,
             'jumlah_buku' => $jumlahBuku,
@@ -255,9 +252,9 @@ class PengembalianController extends Controller
                 $pengembalian->delete();
             });
 
-            return redirect()->back()->with('success', 'Data pengembalian dihapus. Status peminjaman dan stok buku telah dikembalikan.');
+            return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian dihapus. Status peminjaman dan stok buku telah dikembalikan.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus pengembalian: ' . $e->getMessage());
+            return redirect()->route('pengembalian.index')->with('error', 'Gagal menghapus pengembalian: ' . $e->getMessage());
         }
     }
     
@@ -315,4 +312,3 @@ class PengembalianController extends Controller
         return redirect()->back()->with('success', 'Denda berhasil disinkronkan untuk ' . $count . ' data terlambat');
     }
 }
-

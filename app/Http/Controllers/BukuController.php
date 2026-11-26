@@ -193,11 +193,11 @@ class BukuController extends Controller
             })->exists();
 
         if ($isBorrowed) {
-            return redirect()->back()->with('error', 'Buku tidak dapat dihapus karena masih dalam status sedang dipinjam.');
+            return redirect()->route('buku.index')->with('error', 'Buku tidak dapat dihapus karena masih dalam status sedang dipinjam.');
         }
 
         $buku->delete();
 
-        return redirect()->back()->with('success', 'Buku berhasil dihapus');
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil dihapus');
     }
 }

@@ -106,12 +106,12 @@ class AnggotaController extends Controller
         })->exists();
 
         if ($hasActiveTransactions || $hasUnpaidFines) {
-            return redirect()->back()->with('error', 'Anggota tidak dapat dihapus karena masih memiliki transaksi aktif atau denda yang belum lunas.');
+            return redirect()->route('anggota.index')->with('error', 'Anggota tidak dapat dihapus karena masih memiliki transaksi aktif atau denda yang belum lunas.');
         }
 
         $anggota->delete();
 
-        return redirect()->back()->with('success', 'Anggota berhasil dihapus');
+        return redirect()->route('anggota.index')->with('success', 'Anggota berhasil dihapus');
     }
 
     /**
@@ -156,5 +156,3 @@ class AnggotaController extends Controller
         );
     }
 }
-
-
